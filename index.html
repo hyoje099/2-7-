@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2-7이철 포차 - 나의 포차 성향 테스트</title>
+    <style>
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            background-image: url('https://image.ohou.se/i/bucketplace-v2-development/uploads/cards/advices/164749845392985047.jpeg?w=960&h=960&c=c'); /* 포차 분위기의 배경 이미지 URL */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 20px;
+            color: #4a4a4a;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8); /* 반투명 흰색 배경 */
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9); /* 결과 부분도 반투명 흰색 */
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        #result h2 {
+            color: #e74c3c;
+        }
+        #progress {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        #restart, #menu {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>"2-7"이철 포차 - 나의 포차 성향 테스트</h1>
+        <div id="progress"></div>
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <div class="choices" id="choices"></div>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                question: "포차에 가면 주로 무엇을 하나요?", 
+                choices: ["친구들과 시끌벅적 대화", "조용히 음식만 먹기", "새로운 사람 만나기"] 
+            },
+            { 
+                question: "친구들과 있을 때 당신의 모습은?", 
+                choices: ["분위기 메이커", "조용한 관찰자", "이야기 경청자"] 
+            },
+            { 
+                question: "스트레스 해소 방법은?", 
+                choices: ["친구들과 수다", "혼자만의 시간", "새로운 경험"] 
+            },
+            { 
+                question: "포차에서 가장 중요한 것은?", 
+                choices: ["분위기", "맛있는 음식", "대화"] 
+            },
+            { 
+                question: "새로운 친구를 만나면?", 
+                choices: ["바로 친해짐", "조심스럽게 접근", "크게 관심 없음"] 
+            },
+            { 
+                question: "여가 시간에 주로 하는 일은?", 
+                choices: ["친구들과 만남", "혼자 있기", "새로운 활동 찾기"] 
+            },
+            { 
+                question: "포차에서 선호하는 자리는?", 
+                choices: ["중앙 자리", "구석 자리", "창가 자리"] 
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        function displayQuestion() {
+            const questionEl = document.getElementById("question");
+            const choicesEl = document.getElementById("choices");
+            const progressEl = document.getElementById("progress");
+            
+            progressEl.textContent = `질문 ${currentQuestion + 1} / ${questions.length}`;
+            questionEl.textContent = questions[currentQuestion].question;
+            choicesEl.innerHTML = "";
+            
+            questions[currentQuestion].choices.forEach((choice, index) => {
+                const button = document.createElement("button");
+                button.textContent = choice;
+                button.onclick = () => selectAnswer(index);
+                choicesEl.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index) {
+            answers.push(index);
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const resultEl = document.getElementById("result");
+            const quizEl = document.getElementById("quiz");
+            
+            quizEl.style.display = 'none';
+            resultEl.style.display = 'block';
+            
+            let personalityType = analyzePersonality();
+            let recommendation = getRecommendation(personalityType);
+            
+            resultEl.innerHTML = `
+                <h2>당신의 포차 성향은...</h2>
+                <h3>${personalityType}</h3>
+                <p>${recommendation.description}</p>
+                <h4>추천 메뉴: ${recommendation.menu}</h4>
+                <h4>추천 자리: ${recommendation.seat}</h4>
+                <button id="restart" onclick="restartQuiz()">다시 테스트하기</button>
+                <button id="menu" onclick="goToMenu()">2-7 포스터 보기</button>
+            `;
+        }
+
+        function analyzePersonality() {
+            let socialScore = answers.filter(a => a === 0).length;
+            let introvertScore = answers.filter(a => a === 1).length;
+            let adventureScore = answers.filter(a => a === 2).length;
+
+            if (socialScore > introvertScore && socialScore > adventureScore) {
+                return "활발한 사교형";
+            } else if (introvertScore > socialScore && introvertScore > adventureScore) {
+                return "조용한 힐링형";
+            } else {
+                return "새로운 경험 추구형";
+            }
+        }
+
+        function getRecommendation(type) {
+            switch(type) {
+                case "활발한 사교형":
+                    return {
+                        description: "당신은 친구들과 함께 시간을 보내는 것을 좋아하는 활발한 성격이에요. 포차에서 새로운 인연을 만들어보는 건 어떨까요?",
+                        menu: "떡이랑 오뎅",
+                        seat: "중앙 자리"
+                    };
+                case "조용한 힐링형":
+                    return {
+                        description: "당신은 조용히 혼자만의 시간을 즐기는 것을 선호해요. 포차에서 편안한 시간을 보내세요.",
+                        menu: "따뜻한 오뎅",
+                        seat: "구석 자리"
+                    };
+                case "새로운 경험 추구형":
+                    return {
+                        description: "당신은 새로운 경험과 모험을 좋아하는 성격이에요. 포차에서 색다른 즐거움을 찾아보세요!",
+                        menu: "얼큰한 물라면",
+                        seat: "창가 자리"
+                    };
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            displayQuestion();
+        }
+
+        function goToMenu() {
+            window.location.href = 'menu.html';
+        }
+
+        displayQuestion();
+    </script>
+</body>
+</html>

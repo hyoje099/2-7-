@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이철 포차 - 랜덤 포스터</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #poster-container {
+            text-align: center;
+        }
+        #poster {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        #refresh-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #refresh-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="poster-container">
+        <img id="poster" src="" alt="랜덤 포스터">
+        <br>
+        <button id="refresh-btn">다른 포스터 보기</button>
+    </div>
+
+    <script>
+        const posters = [
+            './img/KakaoTalk_20241226_122119185_01.jpg',
+            './img/KakaoTalk_20241226_122119185_02.jpg',
+            './img/KakaoTalk_20241226_122119185.jpg'
+        ];
+
+        function displayRandomPoster() {
+            const randomIndex = Math.floor(Math.random() * posters.length);
+            const posterImg = document.getElementById('poster');
+            posterImg.src = posters[randomIndex];
+        }
+
+        // 페이지 로드 시 랜덤 포스터 표시
+        displayRandomPoster();
+
+        // 버튼 클릭 시 새로운 랜덤 포스터 표시
+        document.getElementById('refresh-btn').addEventListener('click', displayRandomPoster);
+    </script>
+</body>
+</html>
